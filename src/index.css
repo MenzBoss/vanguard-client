@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply font-body bg-white text-gray-900 dark:bg-navy-950 dark:text-gray-100;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  h1, h2, h3, h4, h5, h6 { @apply font-heading tracking-wide; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold-500 hover:bg-gold-600 text-navy-900 font-semibold px-6 py-2.5 rounded transition-all duration-200 uppercase tracking-wider text-sm;
+  }
+  .btn-outline {
+    @apply border-2 border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-navy-900 font-semibold px-6 py-2.5 rounded transition-all duration-200 uppercase tracking-wider text-sm;
+  }
+  .section-title {
+    @apply text-3xl md:text-4xl font-heading uppercase tracking-wider text-navy-900 dark:text-white;
+  }
+  .section-title-accent {
+    @apply text-gold-500;
+  }
+  .card {
+    @apply bg-white dark:bg-navy-900 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300;
+  }
+  .nav-link {
+    @apply text-gray-700 dark:text-gray-200 hover:text-gold-500 dark:hover:text-gold-400 font-medium transition-colors duration-200 uppercase tracking-wider text-sm;
+  }
+  .admin-input {
+    @apply w-full border border-gray-300 dark:border-navy-700 rounded-lg px-4 py-2.5 bg-white dark:bg-navy-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gold-500 focus:outline-none;
+  }
+  .stripe-row {
+    @apply even:bg-gray-50 dark:even:bg-navy-800/50;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-gray-100 dark:bg-navy-950; }
+::-webkit-scrollbar-thumb { @apply bg-gold-500 rounded-full; }
+
+/* Hero overlay */
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(10,22,40,0.9) 0%, rgba(10,22,40,0.6) 50%, rgba(10,22,40,0.8) 100%);
+}
+
+/* Swiper custom */
+.swiper-pagination-bullet-active { background-color: #f59e0b !important; }
+.swiper-button-next::after, .swiper-button-prev::after {
+  color: #f59e0b !important;
+  font-size: 1.2rem !important;
+}
