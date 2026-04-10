@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import api from '../../utils/api';
 import { useFetch } from '../../hooks/useFetch';
 import toast from 'react-hot-toast';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const EMPTY = { title: '', excerpt: '', content: '', category: 'Club News', image: '', featured: false, published: true };
 const CATEGORIES = ['Club News', 'Match Report', 'Transfer', 'Youth', 'Community'];
@@ -119,11 +120,12 @@ export default function ManageNews() {
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Image URL</label>
-                  <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className="admin-input" placeholder="https://..." />
-                </div>
               </div>
+              <ImageUpload
+                value={form.image}
+                onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+                label="Article Image"
+              />
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Excerpt</label>
                 <input value={form.excerpt} onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))} className="admin-input" placeholder="Short description..." />

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, Check, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Trash2, X, Check, TrendingUp, TrendingDown, Pencil } from 'lucide-react';
 import api from '../../utils/api';
 import { useFetch } from '../../hooks/useFetch';
 import toast from 'react-hot-toast';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const EMPTY = { playerName: '', type: 'IN', fromClub: '', toClub: '', fee: 'Undisclosed', position: '', nationality: '', date: '', season: '2024/25', photo: '' };
 
@@ -10,20 +11,48 @@ export default function ManageTransfers() {
   const { data } = useFetch('/transfers');
   const [transfers, setTransfers] = useState([]);
   const [modal, setModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentTransfer, setCurrentTransfer] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => { if (data) setTransfers(data); }, [data]);
 
+  const openAddModal = () => { setEditMode(false); setCurrentTransfer(null); setForm(EMPTY); setModal(true); };
+  const openEditModal = (t) => {
+    setEditMode(true);
+    setCurrentTransfer(t);
+    setForm({
+      playerName: t.playerName,
+      type: t.type,
+      fromClub: t.fromClub || '',
+      toClub: t.toClub || '',
+      fee: t.fee || 'Undisclosed',
+      position: t.position || '',
+      nationality: t.nationality || '',
+      date: t.date ? new Date(t.date).toISOString().slice(0, 10) : '',
+      season: t.season || '2024/25',
+      photo: t.photo || ''
+    });
+    setModal(true);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const { data: created } = await api.post('/transfers', form);
-      setTransfers((prev) => [created, ...prev]);
-      toast.success('Transfer added');
+      if (editMode && currentTransfer) {
+        const { data: updated } = await api.put(`/transfers/${currentTransfer._id}`, form);
+        setTransfers((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
+        toast.success('Transfer updated');
+      } else {
+        const { data: created } = await api.post('/transfers', form);
+        setTransfers((prev) => [created, ...prev]);
+        toast.success('Transfer added');
+      }
       setModal(false);
       setForm(EMPTY);
+      setCurrentTransfer(null);
     } catch (err) { toast.error(err.message); }
     finally { setSaving(false); }
   };
@@ -46,7 +75,7 @@ export default function ManageTransfers() {
           <h1 className="font-heading text-3xl text-navy-900 dark:text-white uppercase">Manage Transfers</h1>
           <p className="text-gray-400 text-sm">{transfers.length} transfers</p>
         </div>
-        <button onClick={() => setModal(true)} className="btn-primary flex items-center gap-2"><Plus size={16} /> Add Transfer</button>
+        <button onClick={openAddModal} className="btn-primary flex items-center gap-2"><Plus size={16} /> Add Transfer</button>
       </div>
 
       <div className="bg-white dark:bg-navy-900 rounded-xl shadow border border-gray-100 dark:border-navy-700 overflow-hidden">
@@ -77,7 +106,10 @@ export default function ManageTransfers() {
                     <td className="py-3 px-4 text-gray-500 dark:text-gray-400">{t.fee}</td>
                     <td className="py-3 px-4 text-gray-400 text-xs">{new Date(t.date).toLocaleDateString()}</td>
                     <td className="py-3 px-4">
-                      <button onClick={() => handleDelete(t._id)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><Trash2 size={14} /></button>
+                      <div className="flex gap-2">
+                        <button onClick={() => openEditModal(t)} className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"><Pencil size={14} /></button>
+                        <button onClick={() => handleDelete(t._id)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><Trash2 size={14} /></button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -92,7 +124,7 @@ export default function ManageTransfers() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto pt-8 pb-8 px-4 bg-black/70">
           <div className="bg-white dark:bg-navy-900 rounded-2xl shadow-2xl w-full max-w-lg">
             <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-navy-700">
-              <h2 className="font-heading text-xl text-navy-900 dark:text-white uppercase">Add Transfer</h2>
+              <h2 className="font-heading text-xl text-navy-900 dark:text-white uppercase">{editMode ? 'Edit Transfer' : 'Add Transfer'}</h2>
               <button onClick={() => setModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-white"><X size={20} /></button>
             </div>
             <form onSubmit={handleSave} className="p-6 space-y-4">
@@ -139,19 +171,17 @@ export default function ManageTransfers() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Player Photo URL</label>
-                <input value={form.photo} onChange={(e) => setForm((f) => ({ ...f, photo: e.target.value }))} className="admin-input" placeholder="https://..." />
-                {form.photo && (
-                  <div className="mt-2 rounded-lg overflow-hidden w-32 h-32 border-2 border-gray-200 dark:border-navy-700">
-                    <img src={form.photo} alt="Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
+                <ImageUpload
+                  value={form.photo}
+                  onChange={(url) => setForm((f) => ({ ...f, photo: url }))}
+                  label="Player Photo"
+                />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setModal(false)} className="btn-outline">Cancel</button>
                 <button type="submit" disabled={saving} className="btn-primary flex items-center gap-2">
                   {saving ? <div className="w-4 h-4 border-2 border-navy-900 border-t-transparent rounded-full animate-spin" /> : <Check size={16} />}
-                  Save
+                  {editMode ? 'Update' : 'Save'}
                 </button>
               </div>
             </form>

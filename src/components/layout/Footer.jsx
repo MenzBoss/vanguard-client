@@ -4,7 +4,7 @@ import { Trophy, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } fr
 const footerLinks = [
   { section: 'Club', links: [{ to: '/team', label: 'Squad' }, { to: '/transfers', label: 'Transfers' }, { to: '/fixtures', label: 'Fixtures' }] },
   { section: 'Media', links: [{ to: '/news', label: 'News' }, { to: '/gallery', label: 'Gallery' }] },
-  { section: 'Info', links: [{ to: '/contact', label: 'Contact Us' }, { to: '/admin', label: 'Admin' }] },
+//   { section: 'Info', links: [{ to: '/contact', label: 'Contact Us' }, { to: '/admin', label: 'Admin' }] },
 ];
 
 export default function Footer() {

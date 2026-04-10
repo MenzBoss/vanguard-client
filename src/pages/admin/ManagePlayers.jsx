@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, X, Check, Shield } from 'lucide-react';
 import api from '../../utils/api';
 import { useFetch } from '../../hooks/useFetch';
 import toast from 'react-hot-toast';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const EMPTY = { name: '', position: 'Midfielder', number: '', photo: '', nationality: '', age: '', bio: '', goals: 0, assists: 0, appearances: 0 };
 const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
@@ -112,10 +113,11 @@ export default function ManagePlayers() {
                   <input value={form.nationality} onChange={(e) => setForm((f) => ({ ...f, nationality: e.target.value }))} className="admin-input" placeholder="e.g. English" />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Photo URL</label>
-                <input value={form.photo} onChange={(e) => setForm((f) => ({ ...f, photo: e.target.value }))} className="admin-input" placeholder="https://..." />
-              </div>
+              <ImageUpload
+                value={form.photo}
+                onChange={(url) => setForm((f) => ({ ...f, photo: url }))}
+                label="Player Photo"
+              />
               <div className="grid grid-cols-3 gap-3">
                 {['appearances', 'goals', 'assists'].map((stat) => (
                   <div key={stat}>

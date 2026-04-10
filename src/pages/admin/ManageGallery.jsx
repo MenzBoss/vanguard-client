@@ -3,6 +3,7 @@ import { Plus, Trash2, X, Check, ZoomIn, Edit } from 'lucide-react';
 import api from '../../utils/api';
 import { useFetch } from '../../hooks/useFetch';
 import toast from 'react-hot-toast';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const CATEGORIES = ['Match Day', 'Training', 'Events', 'Stadium', 'Community'];
 const EMPTY = { title: '', image: '', category: 'Match Day', featured: false };
@@ -117,23 +118,11 @@ export default function ManageGallery() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Title *</label>
                 <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} required className="admin-input" placeholder="Image title" />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Image URL *</label>
-                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} required className="admin-input" placeholder="https://..." />
-                {form.image && (
-                  <div className="mt-2">
-                    <img
-                      src={form.image}
-                      alt="Preview"
-                      className="w-full h-32 object-cover rounded"
-                      onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80';
-                      }}
-                    />
-                    <p className="text-xs text-green-500 mt-1">✓ Image preview</p>
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                value={form.image}
+                onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+                label="Gallery Image *"
+              />
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
                 <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} className="admin-input">

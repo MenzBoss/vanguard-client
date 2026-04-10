@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
     const stored = localStorage.getItem('fcv_admin');
     return stored ? JSON.parse(stored) : null;
   });
+  const [isValidating, setIsValidating] = useState(true);
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
@@ -25,6 +26,29 @@ export function AuthProvider({ children }) {
     toast.success('Logged out successfully');
   };
 
+  // Validate token on mount
+  useEffect(() => {
+    const validateToken = async () => {
+      if (admin?.token) {
+        try {
+          api.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
+          // Try to verify the token is still valid
+          await api.get('/auth/profile');
+        } catch (error) {
+          // Token is invalid or expired
+          console.error('Token validation failed:', error.message);
+          setAdmin(null);
+          localStorage.removeItem('fcv_admin');
+          delete api.defaults.headers.common['Authorization'];
+        }
+      }
+      setIsValidating(false);
+    };
+
+    validateToken();
+  }, []);
+
+  // Set authorization header when admin changes
   useEffect(() => {
     if (admin?.token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
@@ -32,7 +56,7 @@ export function AuthProvider({ children }) {
   }, [admin]);
 
   return (
-    <AuthContext.Provider value={{ admin, login, logout, isAuthenticated: !!admin }}>
+    <AuthContext.Provider value={{ admin, login, logout, isAuthenticated: !!admin, isValidating }}>
       {children}
     </AuthContext.Provider>
   );
